@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Job Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"> <!-- Professional font -->
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #ffffff, #e3f2fd); /* Company-style gradient */
+            color: #333;
+            line-height: 1.6;
+        }
+        .header {
+            background-color: #007bff; /* Blue header for company feel */
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .header .logo {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .header nav {
+            display: flex;
+            gap: 20px;
+        }
+        .header nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .header nav a:hover {
+            color: #e3f2fd;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .job-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .job-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            width: calc(33% - 20px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            background-color: #fafafa;
+        }
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .job-card h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .apply-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .apply-btn:hover {
+            background-color: #218838;
+        }
+        .apply-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .applications {
+            margin-top: 40px;
+        }
+        .application-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #fafafa;
+            transition: background-color 0.3s;
+        }
+        .application-item:hover {
+            background-color: #f0f0f0;
+        }
+        .status {
+            font-weight: bold;
+        }
+        .status.applied { color: #007bff; }
+        .status.shortlisted { color: #ff9800; }
+        .status.rejected { color: #f44336; }
+        .status.interview { color: #4CAF50; }
+        .filters {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .filters input, .filters select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            flex: 1;
+        }
+        .filters button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .filters button:hover {
+            background-color: #0056b3;
+        }
+        .resume-upload {
+            margin-top: 10px;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
+            border-top: 1px solid #ddd;
+        }
+        .footer p {
+            margin: 0;
+            color: #666;
+        }
+        @media (max-width: 768px) {
+            .job-card {
+                width: calc(50% - 20px);
+            }
+            .header nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">JobPortal</div>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">Jobs</a>
+            <a href="#">Profile</a>
+            <a href="#">Logout</a>
+        </nav>
+    </header>
+    <div class="container">
+        <h1>Student Job Dashboard</h1>
+        
+        <div class="filters">
+            <input type="text" id="search" placeholder="Search by Job Title or Company">
+            <select id="location-filter">
+                <option value="">All Locations</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Mumbai">Mumbai</option>
+                <option value="Bangalore">Bangalore</option>
+            </select>
+            <button onclick="filterJobs()">Filter</button>
+        </div>
+        
+        <h2>Available Jobs</h2>
+        <div id="job-list" class="job-list">
+            <!-- Jobs will be populated here -->
+        </div>
+        
+        <div class="applications">
+            <h2>My Applications</h2>
+            <div id="application-list">
+                <!-- Applications will be populated here -->
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <p>&copy; 2023 JobPortal. All rights reserved. | Contact: support@jobportal.com</p>
+    </footer>
+
+    <script>
+        // Simulated database
+        const jobs = [
+            { id: 1, title: "Software Engineer", company: "TechCorp", location: "Delhi", eligibility: "B.Tech, GPA 7.0, 3rd Year", lastDate: "2023-12-31" },
+            { id: 2, title: "Data Analyst", company: "DataInc", location: "Mumbai", eligibility: "BCA, GPA 6.5, 2nd Year", lastDate: "2023-12-25" },
+            { id: 3, title: "Marketing Intern", company: "MarketPro", location: "Bangalore", eligibility: "MBA, GPA 8.0, 1st Year", lastDate: "2023-12-20" },
+            { id: 4, title: "Web Developer", company: "WebSolutions", location: "Delhi", eligibility: "B.Tech, GPA 7.5, 4th Year", lastDate: "2023-12-30" }
+        ];
+
+        let applications = JSON.parse(localStorage.getItem('applications')) || [];
+
+        // Function to render jobs
+        function renderJobs(filteredJobs = jobs) {
+            const jobList = document.getElementById('job-list');
+            jobList.innerHTML = '';
+            filteredJobs.forEach(job => {
+                const applied = applications.some(app => app.jobId === job.id);
+                const jobCard = document.createElement('div');
+                jobCard.className = 'job-card';
+                jobCard.innerHTML = `
+                    <h3>${job.title}</h3>
+                    <p><strong>Company:</strong> ${job.company}</p>
+                    <p><strong>Location:</strong> ${job.location}</p>
+                    <p><strong>Eligibility:</strong> ${job.eligibility}</p>
+                    <p><strong>Last Date:</strong> ${job.lastDate}</p>
+                    <button class="apply-btn" onclick="applyForJob(${job.id})" ${applied ? 'disabled' : ''}>${applied ? 'Applied' : 'Apply'}</button>
+                    <div class="resume-upload" style="display: ${applied ? 'none' : 'block'};">
+                        <input type="file" id="resume-${job.id}" accept=".pdf,.doc,.docx">
+                    </div>
+                `;
+                jobList.appendChild(jobCard);
+            });
+        }
+
+        // Function to apply for a job
+        function applyForJob(jobId) {
+            const resumeInput = document.getElementById(`resume-${jobId}`);
+            if (!resumeInput.files[0]) {
+                alert('Please upload a resume before applying.');
+                return;
+            }
+            const application = {
+                id: Date.now(),
+                jobId: jobId,
+                status: 'Applied',
+                appliedDate: new Date().toISOString().split('T')[0]
+            };
+            applications.push(application);
+            localStorage.setItem('applications', JSON.stringify(applications));
+            renderJobs();
+            renderApplications();
+            alert('Application submitted successfully!');
+        }
+
+        // Function to render applications
+        function renderApplications() {
+            const appList = document.getElementById('application-list');
+            appList.innerHTML = '';
+            applications.forEach(app => {
+                const job = jobs.find(j => j.id === app.jobId);
+                const appItem = document.createElement('div');
+                appItem.className = 'application-item';
+                appItem.innerHTML = `
+                    <p><strong>Job:</strong> ${job.title} at ${job.company}</p>
+                    <p><strong>Applied Date:</strong> ${app.appliedDate}</p>
+                    <p class="status ${app.status.toLowerCase()}"><strong>Status:</strong> ${app.status}</p>
+                `;
+                appList.appendChild(appItem);
+            });
+        }
+
+        // Function to filter jobs
+        function filterJobs() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const location = document.getElementById('location-filter').value;
+            const filtered = jobs.filter(job => {
+                return (job.title.toLowerCase().includes(search) || job.company.toLowerCase().includes(search)) &&
+                       (location === '' || job.location === location);
+            });
+            renderJobs(filtered);
+        }
+
+        // Simulate status updates (for demo, randomly update statuses)
+        function simulateStatusUpdates() {
+            applications.forEach(app => {
+                if (app.status === 'Applied' && Math.random() > 0.7) {
+                    const statuses = ['Shortlisted', 'Rejected', 'Interview Scheduled'];
+                    app.status = statuses[Math.floor(Math.random() * statuses.length)];
+                }
+            });
+            localStorage.setItem('applications', JSON.stringify(applications));
+            renderApplications();
+        }
+
+        // Initial render
+        renderJobs();
+        renderApplications();
+
+        // Simulate status updates every 10 seconds for demo
+        setInterval(simulateStatusUpdates, 10000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Dashboard - Campus Placement Management System</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        header .notification-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-bell, .settings-icon {
+            font-size: 24px;
+            cursor: pointer;
+            margin-left: 15px;
+            position: relative;
+        }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            display: none;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 250px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            display: none;
+            color: black;
+            z-index: 1000;
+        }
+
+        .settings-panel h4 {
+            margin-bottom: 10px;
+        }
+
+        .settings-panel label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .settings-panel input {
+            margin-right: 5px;
+        }
+
+        /* Notification Dropdown */
+        .notification-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 350px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .dropdown-header {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropdown-header button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .dropdown-header button:hover {
+            background-color: #0056b3;
+        }
+
+        .notification-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .notification-item.unread {
+            background-color: #e3f2fd;
+            font-weight: bold;
+        }
+
+        .notification-message {
+            font-size: 14px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .notification-actions {
+            margin-top: 5px;
+        }
+
+        .view-details {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .view-details:hover {
+            text-decoration: underline;
+        }
+
+        .mark-read {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Main Dashboard */
+        .main-content {
+            padding: 20px;
+        }
+
+        .dashboard-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            flex: 1 1 200px;
+            background: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 16px;
+            color: #555;
+        }
+
+        /* Charts */
+        .charts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .chart-container {
+            flex: 1 1 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-warning { background: #fff3cd; color: #856404; }
+        .alert-info { background: #d1ecf1; color: #0c5460; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+
+        .alert-close {
+            float: right;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 800px) {
+            .dashboard-cards, .charts {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Recruiter Dashboard</div>
+        <div class="notification-container">
+            <span class="settings-icon" id="settingsIcon">⚙️</span>
+            <div class="notification-bell" id="bell">🔔</div>
+            <span class="badge" id="badge">0</span>
+
+            <!-- Settings Panel -->
+            <div class="settings-panel" id="settingsPanel">
+                <h4>Settings</h4>
+                <label><input type="checkbox" id="enableAlerts" checked> Enable Alerts</label>
+                <label><input type="checkbox" id="enableSounds"> Enable Sounds</label>
+                <label><input type="checkbox" id="enableEmails"> Email Notifications</label>
+            </div>
+
+            <!-- Notification Dropdown -->
+            <div class="notification-dropdown" id="notificationDropdown">
+                <div class="dropdown-header">
+                    <strong>Notifications</strong>
+                    <div>
+                        <button onclick="markAllAsRead()">Mark All Read</button>
+                        <button onclick="clearAllNotifications()">Clear All</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <!-- Alerts -->
+        <div class="alert alert-success" id="alertSuccess"><span class="alert-close" onclick="closeAlert('alertSuccess')">&times;</span>New application received!</div>
+        <div class="alert alert-info" id="alertInfo"><span class="alert-close" onclick="closeAlert('alertInfo')">&times;</span>System updated successfully.</div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-cards">
+            <div class="card">
+                <h3>Total Applications</h3>
+                <p id="totalApplications">0</p>
+            </div>
+            <div class="card">
+                <h3>Scheduled Interviews</h3>
+                <p id="totalInterviews">0</p>
+            </div>
+            <div class="card">
+                <h3>Offers Made</h3>
+                <p id="totalOffers">0</p>
+            </div>
+            <div class="card">
+                <h3>Placements Completed</h3>
+                <p id="totalPlacements">0</p>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts">
+            <div class="chart-container">
+                <canvas id="applicationsChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="placementChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Dummy data
+        let notifications = [
+            { id: 1, message: "New application from John Doe.", time: "2 hours ago", unread: true },
+            { id: 2, message: "Interview scheduled for Jane Smith.", time: "1 day ago", unread: true },
+            { id: 3, message: "Placement completed for Mike Lee.", time: "3 days ago", unread: false }
+        ];
+
+        const bell = document.getElementById('bell');
+        const badge = document.getElementById('badge');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const settingsIcon = document.getElementById('settingsIcon');
+
+        // Settings
+        let enableAlerts = true;
+        let enableSounds = false;
+        let enableEmails = false;
+
+        document.getElementById('enableAlerts').addEventListener('change', e => enableAlerts = e.target.checked);
+        document.getElementById('enableSounds').addEventListener('change', e => enableSounds = e.target.checked);
+        document.getElementById('enableEmails').addEventListener('change', e => enableEmails = e.target.checked);
+
+        // Render notifications
+        function renderNotifications() {
+            while(notificationDropdown.children.length > 1){
+                notificationDropdown.removeChild(notificationDropdown.lastChild);
+            }
+            let unreadCount = 0;
+            notifications.forEach(n => {
+                if(n.unread) unreadCount++;
+                const div = document.createElement('div');
+                div.className = 'notification-item' + (n.unread ? ' unread' : '');
+                div.innerHTML = `
+                    <div class="notification-message">${n.message}</div>
+                    <div class="notification-time">${n.time}</div>
+                    <div class="notification-actions">
+                        <a href="#" class="view-details" onclick="viewDetails(${n.id})">View Details</a>
+                        ${n.unread ? '<button class="mark-read" onclick="markAsRead(' + n.id + ')">Mark Read</button>' : ''}
+                    </div>
+                `;
+                notificationDropdown.appendChild(div);
+            });
+            badge.textContent = unreadCount;
+            badge.style.display = unreadCount > 0 ? 'inline' : 'none';
+        }
+
+        bell.addEventListener('click', () => {
+            settingsPanel.style.display = 'none';
+            notificationDropdown.style.display = notificationDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        settingsIcon.addEventListener('click', () => {
+            notificationDropdown.style.display = 'none';
+            settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
+        });
+
+        function markAsRead(id){
+            const n = notifications.find(x => x.id === id);
+            if(n){ n.unread = false; renderNotifications(); }
+        }
+
+        function markAllAsRead(){
+            notifications.forEach(n => n.unread = false);
+            renderNotifications();
+        }
+
+        function clearAllNotifications(){
+            notifications = [];
+            renderNotifications();
+        }
+
+        function viewDetails(id){
+            alert('Viewing notification ID: ' + id);
+        }
+
+        function closeAlert(alertId){
+            document.getElementById(alertId).style.display = 'none';
+        }
+
+        renderNotifications();
+
+        // Dashboard data
+        let totalApplications = 120;
+        let totalInterviews = 35;
+        let totalOffers = 20;
+        let totalPlacements = 15;
+
+        document.getElementById('totalApplications').textContent = totalApplications;
+        document.getElementById('totalInterviews').textContent = totalInterviews;
+        document.getElementById('totalOffers').textContent = totalOffers;
+        document.getElementById('totalPlacements').textContent = totalPlacements;
+
+        // Charts
+        const applicationsChart = new Chart(document.getElementById('applicationsChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+                datasets: [{
+                    label: 'Applications',
+                    data: [20, 25, 30, 35, 40, 50],
+                    backgroundColor: '#007bff'
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        const placementChart = new Chart(document.getElementById('placementChart'), {
+            type: 'line',
+            data: {
+                labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+                datasets: [{
+                    label: 'Placements',
+                    data: [5,7,8,10,12,15],
+                    borderColor: '#28a745',
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: { responsive: true }
+        });
+    </script>
+</body>
+</html>

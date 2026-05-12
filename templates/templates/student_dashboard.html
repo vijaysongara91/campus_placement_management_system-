@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Campus Placement System</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            color: #fff;
+        }
+
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        /* Main container */
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-right: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 1rem;
+        }
+
+        .sidebar a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            overflow: hidden;
+            flex-wrap: wrap; /* Allow wrapping for more tabs */
+        }
+
+        .tab {
+            flex: 1;
+            min-width: 120px; /* Minimum width for tabs */
+            padding: 1rem;
+            text-align: center;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Cards and sections */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h3 {
+            color: #fff;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .card p, .card li {
+            color: #ddd;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        /* Table styles for technical look */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            background: #4CAF50;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #45a049;
+        }
+
+        .btn.danger {
+            background: #f44336;
+        }
+
+        .btn.danger:hover {
+            background: #da190b;
+        }
+
+        /* File input for resume */
+        input[type="file"] {
+            margin-top: 1rem;
+            color: #fff;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card, .tab-content {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 2rem;
+            }
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Campus Placement System - Student Portal</h1>
+        <div class="user-info">
+            <img src="https://via.placeholder.com/40" alt="Student Avatar">
+            <span>{{ user.full_name }}</span>
+
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <ul>
+                <li><a href="#" onclick="showTab('dashboard')">Dashboard</a></li>
+                <li><a href="#" onclick="showTab('profile')">Profile Management</a></li>
+                <li><a href="#" onclick="showTab('jobs')">Job Search & Apply</a></li>
+                <li><a href="applied_jobs.html" onclick="showTab('applied')">Applied Jobs</a></li>
+                <li><a href="#" onclick="showTab('interviews')">Interview Schedules</a></li>
+                <li><a href="#" onclick="showTab('offers')">Offers & Results</a></li>
+                <li><a href="#" onclick="showTab('notifications')">Notifications</a></li>
+                <li><a href="#" onclick="showTab('resume')">Resume/CV Upload</a></li>
+                <li><a href="#" onclick="showTab('feedback')">Feedback & Reviews</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('dashboard')">Dashboard</div>
+                <div class="tab" onclick="showTab('profile')">Profile</div>
+                <div class="tab" onclick="showTab('jobs')">Jobs</div>
+                <div class="tab" onclick="showTab('applied')">Applied</div>
+                <div class="tab" onclick="showTab('interviews')">Interviews</div>
+                <div class="tab" onclick="showTab('offers')">Offers</div>
+                <div class="tab" onclick="showTab('notifications')">Notifications</div>
+                <div class="tab" onclick="showTab('resume')">Resume</div>
+                <div class="tab" onclick="showTab('feedback')">Feedback</div>
+            </div>
+
+            <div id="dashboard" class="tab-content active">
+                <div class="card">
+                    <h3>Placement Statistics</h3>
+                    <p>Applications Sent: <span class="stat">12</span></p>
+                    <p>Interviews Scheduled: <span class="stat">3</span></p>
+                    <p>Offers Received: <span class="stat">1</span></p>
+                    <p>Success Rate: <span class="stat">8.3%</span></p>
+                </div>
+                <div class="card">
+                    <h3>Recent Activities</h3>
+                    <ul>
+                        <li>Applied to Amazon - 2 days ago</li>
+                        <li>Interview feedback received from Google - 1 week ago</li>
+                        <li>Profile updated - 2 weeks ago</li>
+                        <li>Resume downloaded by Microsoft - 3 weeks ago</li>
+                    </ul>
+                </div>
+            </div>
+            
+              <div id="profile" class="tab-content">
+                <div class="card">
+                    <h3>Personal Information</h3>
+                    
+                    <p><strong>Name:</strong> {{ user.full_name }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Phone:</strong> {{ user.mobile }}</p>
+                    
+                    <p><strong>Resume:</strong> 
+                        <a href="{{ user.resume.url }}" style="color: #00ffcc;">Download Resume</a>
+                    </p>
+                    
+                    <button class="btn">Edit Profile</button>
+                 </div>
+                </div>
+
+                
+                <div class="card">
+                    <h3>Skills & Certifications</h3>
+                    <p>Skills: Java, Python, Web Development</p>
+                    <p>Certifications: AWS Certified, Google Cloud</p>
+                    <button class="btn">Update Skills</button>
+                </div>
+            </div>
+
+            <div id="jobs" class="tab-content">
+                <div class="card">
+                    <h3>Available Jobs</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Position</th>
+                                <th>Deadline</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Google</td>
+                                <td>Software Engineer</td>
+                                <td>2023-10-20</td>
+                                <td><button class="btn">Apply</button></td>
+                            </tr>
+                            <tr>
+                                <td>Amazon</td>
+                                <td>Data Analyst</td>
+                                <td>2023-10-25</td>
+                                <td><button class="btn">Apply</button></td>
+                            </tr>
+                            <tr>
+                                <td>Microsoft</td>
+                                <td>Intern</td>
+                                <td>2023-11-01</td>
+                                <td><button class="btn">Apply</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="applied" class="tab-content">
+                <div class="card">
+                    <h3>Applied Jobs Status</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th>Applied Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Google</td>
+                                <td>Software Engineer</td>
+                                <td>Under Review</td>
+                                <td>2023-09-15</td>
+                            </tr>
+                            <tr>
+                                <td>Amazon</td>
+                                <td>Data Analyst</td>
+                                <td>Interview Scheduled</td>
+                                <td>2023-09-10</td>
+                            </tr>
+                            <tr>
+                                <td>Microsoft</td>
+                                <td>Intern</td>
+                                <td>Rejected</td>
+                                <td>2023-08-20</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="interviews" class="tab-content">
+                <div class="card">
+                    <h3>Upcoming Interviews</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Date & Time</th>
+                                <th>Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Google</td>
+                                <td>2023-10-15 10:00 AM</td>
+                                <td>Technical Round</td>
+                                <td><button class="btn">Join</button></td>
+                            </tr>
+                            <tr>
+                                <td>Amazon</td>
+                                <td>2023-10-20 2:00 PM</td>
+                                <td>HR Round</td>
+                                <td><button class="btn">Join</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="offers" class="tab-content">
+                <div class="card">
+                    <h3>Received Offers</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Position</th>
+                                <th>Salary</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Google</td>
+                                <td>Software Engineer</td>
+                                <td>$120,000</td>
+                                <td><button class="btn">Accept</button> <button class="btn danger">Reject</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="notifications" class="tab-content">
+                <div class="card">
+                    <h3>Notifications</h3>
+                    <ul>
+                        <li>New job opening at Tesla - 1 hour ago</li>
+                        <li>Interview reminder for Amazon - Tomorrow</li>
+                        <li>Profile update approved - 2 days ago</li>
+                        <li>System maintenance scheduled - Next week</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="resume" class="tab-content">
+                <div class="card">
+                    <h3>Resume/CV Upload</h3>
+                    <p>Upload your latest resume or CV for job applications.</p>
+                    <input type="file" accept=".pdf,.doc,.docx">
+                    <button class="btn">Upload</button>
+                </div>
+            </div>
+
+            <div id="feedback" class="tab-content">
+                <div class="card">
+                    <h3>Feedback & Reviews</h3>
+                    <p>Share your feedback on recent interviews or the platform.</p>
+                    <textarea placeholder="Enter your feedback here..." rows="4" style="width: 100%; margin-bottom: 1rem;"></textarea>
+                    <button class="btn">Submit Feedback</button>
+                </div>
+                <div class="card">
+                    <h3>Recent Reviews</h3>
+                    <ul>
+                        <li>Great platform for placements! - Anonymous</li>
+                        <li>Easy to use interface. - Student A</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function logout() {
+            alert('Logging out...');
+            // Add actual logout logic here, e.g., redirect to login page
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Analytics & Reports - Placement Management System</title>
+    <!-- Chart.js for clear and professional charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            width: 20%;
+        }
+
+        .chart-container {
+            margin: 20px 0;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        canvas {
+            max-width: 100%;
+            height: 300px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .insights {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #ffc107;
+        }
+
+        @media (max-width: 768px) {
+            .stats {
+                flex-direction: column;
+            }
+            .stat-card {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Campus Placement Management System</h1>
+        <h2>Recruiter Analytics & Reports</h2>
+    </header>
+    
+    <main>
+        <section id="hiring-data">
+            <h2>Hiring Data</h2>
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Total Candidates</h3>
+                    <p id="total-candidates">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Placed Candidates</h3>
+                    <p id="placed-candidates">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Placement Rate</h3>
+                    <p id="placement-rate">0%</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Average CGPA</h3>
+                    <p id="avg-cgpa">0.0</p>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="branch-chart"></canvas>
+            </div>
+        </section>
+        
+        <section id="performance-insights">
+            <h2>Performance Insights</h2>
+            <div class="insights">
+                <p><strong>Key Insights:</strong></p>
+                <ul id="insights-list">
+                    <!-- Insights will be populated here -->
+                </ul>
+            </div>
+            <div class="chart-container">
+                <canvas id="skills-chart"></canvas>
+            </div>
+        </section>
+        
+        <section id="decision-reports">
+            <h2>Decision-Making Reports</h2>
+            <table id="reports-table">
+                <thead>
+                    <tr>
+                        <th>Candidate Name</th>
+                        <th>Branch</th>
+                        <th>CGPA</th>
+                        <th>Skills</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="reports-body">
+                    <!-- Reports will be populated here -->
+                </tbody>
+            </table>
+            <button onclick="generateReport()">Generate Detailed Report</button>
+            <div id="report-output" style="margin-top: 20px; display: none;">
+                <h3>Detailed Report</h3>
+                <pre id="report-text"></pre>
+            </div>
+        </section>
+        
+        <section id="future-analytics">
+            <h2>Future Planning Analytics</h2>
+            <p>Based on current trends, here are predictions and recommendations:</p>
+            <div class="insights">
+                <ul id="future-insights">
+                    <!-- Future insights will be populated here -->
+                </ul>
+            </div>
+            <div class="chart-container">
+                <canvas id="trend-chart"></canvas>
+            </div>
+        </section>
+    </main>
+    
+    <script>
+        // Mock data for analytics
+        const candidates = [
+            { name: "John Doe", branch: "Computer Science", cgpa: 8.5, skills: "Java, Python, SQL", status: "Placed" },
+            { name: "Jane Smith", branch: "Information Technology", cgpa: 7.8, skills: "JavaScript, React, Node.js", status: "Placed" },
+            { name: "Alice Johnson", branch: "Computer Science", cgpa: 9.0, skills: "Python, Machine Learning, Data Science", status: "Placed" },
+            { name: "Bob Brown", branch: "Electronics", cgpa: 7.2, skills: "C++, Embedded Systems", status: "Not Placed" },
+            { name: "Charlie Wilson", branch: "Computer Science", cgpa: 8.0, skills: "Java, Spring Boot, MySQL", status: "Placed" },
+            { name: "Amit Sharma", branch: "Computer Science", cgpa: 8.1, skills: "Java, HTML, CSS", status: "Placed" },
+            { name: "Priya Verma", branch: "Electronics", cgpa: 7.5, skills: "Python, Embedded", status: "Not Placed" },
+            { name: "Ravi Kumar", branch: "Mechanical", cgpa: 7.0, skills: "AutoCAD, SolidWorks", status: "Placed" },
+            { name: "Neha Singh", branch: "Computer Science", cgpa: 8.7, skills: "Python, Machine Learning", status: "Placed" },
+            { name: "Kunal Vora", branch: "Electronics", cgpa: 8.3, skills: "JavaScript, IoT", status: "Placed" }
+        ];
+
+        // Calculate and display stats
+        function calculateStats() {
+            const total = candidates.length;
+            const placed = candidates.filter(c => c.status === "Placed").length;
+            const rate = ((placed / total) * 100).toFixed(2);
+            const avgCgpa = (candidates.reduce((sum, c) => sum + c.cgpa, 0) / total).toFixed(2);
+
+            document.getElementById('total-candidates').textContent = total;
+            document.getElementById('placed-candidates').textContent = placed;
+            document.getElementById('placement-rate').textContent = rate + '%';
+            document.getElementById('avg-cgpa').textContent = avgCgpa;
+        }
+
+        // Create clear bar chart using Chart.js
+        function createBarChart(canvasId, data, labels, title, colors = ['#007bff', '#28a745', '#ffc107', '#dc3545']) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: title,
+                        data: data,
+                        backgroundColor: colors.slice(0, data.length),
+                        borderColor: colors.slice(0, data.length).map(color => color.replace('0.8', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: title
+                        }
+                    }
+                }
+            });
+        }
+
+        // Generate insights
+        function generateInsights() {
+            const placed = candidates.filter(c => c.status === "Placed");
+            const avgPlacedCgpa = (placed.reduce((sum, c) => sum + c.cgpa, 0) / placed.length).toFixed(2);
+            const topBranch = [...new Set(candidates.map(c => c.branch))].reduce((a, b) => 
+                candidates.filter(c => c.branch === a && c.status === "Placed").length > candidates.filter(c => c.branch === b && c.status === "Placed").length ? a : b
+            );
+
+            const insightsList = document.getElementById('insights-list');
+            insightsList.innerHTML = `
+                <li>Average CGPA of placed candidates: ${avgPlacedCgpa}</li>
+                <li>Top performing branch: ${topBranch}</li>
+                <li>Focus on skills like Java and Python for better placements.</li>
+            `;
+
+            const futureInsights = document.getElementById('future-insights');
+            futureInsights.innerHTML = `
+                <li>Increase focus on Electronics branch for higher placements.</li>
+                <li>Plan workshops on Machine Learning to boost future hiring.</li>
+                <li>Predicted placement rate next year: 85% based on trends.</li>
+            `;
+        }
+
+        // Populate reports table
+        function populateReports() {
+            const tbody = document.getElementById('reports-body');
+            candidates.forEach(c => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${c.name}</td>
+                    <td>${c.branch}</td>
+                    <td>${c.cgpa}</td>
+                    <td>${c.skills}</td>
+                    <td>${c.status}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Generate detailed report
+        function generateReport() {
+            const reportText = `
+Campus Placement Report
+=======================
+
+Total Candidates: ${candidates.length}
+Placed Candidates: ${candidates.filter(c => c.status === "Placed").length}
+Placement Rate: ${((candidates.filter(c => c.status === "Placed").length / candidates.length) * 100).toFixed(2)}%
+Average CGPA: ${(candidates.reduce((sum, c) => sum + c.cgpa, 0) / candidates.length).toFixed(2)}
+
+Branch-wise Breakdown:
+- Computer Science: ${candidates.filter(c => c.branch === "Computer Science" && c.status === "Placed").length} placed
+- Electronics: ${candidates.filter(c => c.branch === "Electronics" && c.status === "Placed").length} placed
+- Mechanical: ${candidates.filter(c => c.branch === "Mechanical" && c.status === "Placed").length} placed
+
+Recommendations:
+- Enhance training in high-demand skills.
+- Target top CGPA students for premium roles.
+            `;
+            document.getElementById('report-text').textContent = reportText;
+            document.getElementById('report-output').style.display = 'block';
+        }
+
+        // Initialize page
+        window.onload = function() {
+            calculateStats();
+            generateInsights();
+            populateReports();
+
+            // Branch chart
+            const branchData = ["Computer Science", "Electronics", "Mechanical"];
+            const branchPlaced = branchData.map(b => candidates.filter(c => c.branch === b && c.status === "Placed").length);
+            createBarChart('branch-chart', branchPlaced, branchData, 'Placements by Branch');
+
+            // Skills chart
+            const skillsData = ["Java", "Python", "JavaScript"];
+            const skillsCount = skillsData.map(s => candidates.filter(c => c.skills.includes(s) && c.status === "Placed").length);
+            createBarChart('skills-chart', skillsCount, skillsData, 'Placements by Skills');
+
+            // Trend chart (mock future data)
+            const trendData = [70, 75, 80, 85]; // Mock percentages
+            const trendLabels = ["Year 1", "Year 2", "Year 3", "Year 4"];
+            createBarChart('trend-chart', trendData, trendLabels, 'Placement Trends Over Years');
+        };
+    </script>
+</body>
+</html>

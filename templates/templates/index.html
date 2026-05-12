@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Placement Cell, PITS Ujjain</title>
+    <!-- Added Font Awesome for Instagram icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f7f7; /* Removed background image from body to keep it only in hero section */
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #4a66e9;
+            padding: 10px 30px;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .navbar-left img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        .navbar-right {
+            display: flex;
+            gap: 25px;
+            font-weight: 600;
+        }
+        .navbar-right a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+        .navbar-right a:hover {
+            color: #cbd1f7;
+        }
+
+        /* Hero Section - Background image only here, made clear and attractive */
+        .hero {
+            position: relative;
+            background-image: url('https://scontent.fidr1-1.fna.fbcdn.net/v/t39.30808-6/469868068_603993628634013_7959127753969340934_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=Yq3gpH6N1zkQ7kNvwHHVv7R&_nc_oc=Adosh7A348FZTzHz4nxMZiXZ4TvIbr0nZq1H-3iqhPCDDFpktB7aGOJi_iW_HEcV0xlT-Ew60l1r2OPiGtWHzOF_&_nc_zt=23&_nc_ht=scontent.fidr1-1.fna&_nc_gid=HwdZkc1S1v1tOr6TcLaF0A&_nc_ss=7b289&oh=00_Af5Cww6FjPm1oLUsXAIJ-rq15InCl7MpnFIKlkiFHJM3nA&oe=6A0922E1'); /* Used the institute's front image for relevance and attractiveness */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 500px; /* Slightly increased height for better visibility */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 40px 60px;
+            color: white;
+        }
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4); /* Reduced opacity for clearer image visibility */
+            border-radius: 15px;
+            max-width: 60%;
+            height: 100%;
+            padding: 20px 40px;
+            z-index: 1;
+            margin-bottom: 80%;
+        }
+        .overlay h1 {
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 40px;
+        }
+        .overlay p {
+            font-size: 22px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        /* Buttons container */
+        .hero-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 5;
+            margin-left: 80%;
+            margin-top: 10%;
+        }
+
+        /* Individual buttons */
+        .hero-buttons button {
+            background-color: #384dbb;
+            border: 2px solid white;
+            color: white;
+            cursor: pointer;
+            padding: 13px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .hero-buttons button:hover {
+            background-color: #2a3888;
+            border-color: #bbc7ff;
+        }
+        /* Icons style */
+        .button-icon {
+            font-size: 22px;
+        }
+
+        /* Sections */
+        .section {
+            padding: 60px 30px;
+            background-color: rgba(255, 255, 255, 0.9);
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #4a66e9;
+            font-size: 32px;
+        }
+        .section p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .section ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        .section li {
+            margin-bottom: 10px;
+        }
+
+        /* Contact Us Specific */
+        .contact-details {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .contact-person {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            min-width: 250px;
+        }
+        .contact-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #4a66e9;
+            margin-bottom: 10px;
+        }
+        .contact-info h3 {
+            color: #4a66e9;
+            margin-bottom: 10px;
+        }
+        .contact-info p {
+            margin-bottom: 5px;
+        }
+
+        /* Dashboard Section */
+        .dashboard {
+            padding: 50px 30px;
+            background-color: rgba(255, 255, 255, 0.95);
+            min-height: 100vh;
+            display: none;
+        }
+        .dashboard h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #4a66e9;
+            font-size: 32px;
+        }
+        .dashboard-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .tab-button {
+            background-color: #e0e0e0;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .tab-button.active {
+            background-color: #4a66e9;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .dashboard-item {
+            margin-bottom: 20px;
+        }
+        .dashboard-item h3 {
+            color: #4a66e9;
+            margin-bottom: 10px;
+        }
+        .dashboard-item p, .dashboard-item ul {
+            margin-bottom: 10px;
+        }
+        .dashboard-item button {
+            background-color: #4a66e9;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .dashboard-item button:hover {
+            background-color: #384dbb;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #4a66e9;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        /* Added styles for social links (Instagram) */
+        .social-links {
+            margin-top: 10px;
+        }
+        .social-links a {
+            color: white;
+            font-size: 24px;
+            margin: 0 10px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .social-links a:hover {
+            color: #cbd1f7;
+        }
+
+        /* Responsive */
+        @media(max-width: 900px) {
+            .hero {
+                flex-direction: column;
+                height: auto;
+                padding: 30px 20px;
+            }
+            .overlay {
+                max-width: 100%;
+                margin-bottom: 30px;
+                border-radius: 10px;
+                padding: 25px;
+            }
+            .hero-buttons {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+               
+            }
+            .hero-buttons button {
+                flex: 1 1 45%;
+                justify-content: center;
+        
+            }
+            .dashboard-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            .section {
+                padding: 40px 20px;
+            }
+            .contact-details {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <img src="https://prashantigroup.in/images/Plogo.png" alt="PITS Logo" />
+            Placement Cell, PITS Ujjain
+        </div>
+        <div class="navbar-right">
+            <a href="#overview">Overview</a>
+            <a href="#directors-message">Director's Message</a>
+            <a href="#contact-us">Contact Us</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="overlay">
+            <h1>A one stop portal for Placements & Internships</h1>
+            <p>
+                Welcome to the recruitment website For PITS Ujjain. <br/>
+                PITS is India's foremost industrial leadership development institution. Our graduates are a combination of rigorous thinking, hardwork and fundamental stronghold. They are nurtured by the institute to strive for excellence and deliver impact in their field of work. Let us begin...
+            </p>
+        </div>
+        
+        <div class="hero-buttons">
+            <button onclick="window.location.href='login.html'"><span class="button-icon">👤</span> Student</button>
+            <button onclick="window.location.href='recruiter.html'""><span class="button-icon">🎒</span> Recruiter</button>
+            <button onclick="window.location.href='cordinator.html'"><span class = "button-icon">📦</span>cordinator</button>
+            <button onclick="window.location.href='verifier.html'"><span class = "button-icon">✔️</span>verifier</button>
+        </div>
+    </section>
+
+    <!-- Overview Section -->
+    <section id="overview" class="section">
+        <h2>Overview</h2>
+        <p>The Placement Cell at PITS Ujjain is dedicated to bridging the gap between academia and industry. We provide a comprehensive platform for students to connect with top recruiters, ensuring career opportunities that align with their skills and aspirations.</p>
+        <p>Our mission is to facilitate seamless placements and internships, fostering a culture of excellence and innovation.</p>
+    </section>
+
+    <!-- Director's Message Section -->
+    <section id="directors-message" class="section">
+        <h2>Director's Message</h2>
+        <p>"At PITS Ujjain, we believe in nurturing talent that drives innovation and leadership. Our placement cell is committed to providing our students with opportunities to excel in their careers. We invite recruiters to join us in shaping the future workforce."</p>
+        <p>- Director, PITS Ujjain</p>
+    </section>
+
+    <!-- Contact Us Section -->
+    <section id="contact-us" class="section">
+        <h2>Contact Us</h2>
+        <div class="contact-details">
+            <div class="contact-person">
+                <img src="https://images.unsplash.com/photo-1592009309602-1dde752490ae?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80" alt="Placement Officer 1 Photo" class="contact-photo" />
+                <div class="contact-info">
+                    <h3>Dr. Rajesh Kumar</h3>
+                    <p><strong>Designation:</strong> Placement Officer</p>
+                    <p><strong>Email:</strong> placements@pitsujjain.edu.in</p>
+                    <p><strong>Phone:</strong> +91-123-456-7890</p>
+                </div>
+            </div>
+            <div class="contact-person">
+                <img src="https://img.freepik.com/premium-photo/young-happy-professional-business-woman_849906-15993.jpg?w=740" alt="Placement Officer 2 Photo" class="contact-photo" />
+                <div class="contact-info">
+                    <h3>Ms. Priya Sharma</h3>
+                    <p><strong>Designation:</strong> Assistant Placement Officer</p>
+                    <p><strong>Email:</strong> priya.sharma@pitsujjain.edu.in</p>
+                    <p><strong>Phone:</strong> +91-987-654-3210</p>
+                </div>
+            </div>
+        </div>
+        <p><strong>Address:</strong> Prashanti Institute of Technology and Science, Ujjain, Madhya Pradesh, India</p>
+        <p>For any inquiries related to placements, internships, or recruitment, feel free to reach out to us. We are here to assist you!</p>
+    </section>
+
+  
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2023 Placement Cell, PITS Ujjain. All rights reserved.</p>
+        <!-- Added Instagram logo/link below the home page content -->
+        <div class="social-links">
+            <a href="https://www.instagram.com/prashantigroupofinstitutions" target="_blank" title="Follow us on Instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function showDashboard(role) {
+            document.getElementById('dashboard-section').style.display = 'block';
+            // Note: The original script was incomplete; assuming it's for dashboard functionality, left as is.
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verifier Dashboard | Campus Placement System</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background-color: #f3f6fa;
+      color: #333;
+    }
+
+    header {
+      background-color: #004aad;
+      color: white;
+      padding: 15px 30px;
+      text-align: center;
+      font-size: 1.5em;
+      letter-spacing: 1px;
+    }
+
+    .container {
+      display: flex;
+      height: calc(100vh - 70px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+      padding-top: 20px;
+    }
+
+    .sidebar h3 {
+      text-align: center;
+      color: #004aad;
+      margin-bottom: 20px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar li {
+      padding: 15px 20px;
+      cursor: pointer;
+      color: #333;
+      border-left: 4px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .sidebar li:hover, .sidebar li.active {
+      background: #e6efff;
+      border-left: 4px solid #004aad;
+      color: #004aad;
+    }
+
+    /* Main Dashboard */
+    .main {
+      flex: 1;
+      padding: 25px;
+      overflow-y: auto;
+    }
+
+    h2 {
+      color: #004aad;
+      margin-bottom: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background: #004aad;
+      color: #fff;
+    }
+
+    tr:hover {
+      background-color: #f1f6ff;
+    }
+
+    button {
+      padding: 6px 12px;
+      margin: 2px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .approve-btn { background-color: #28a745; }
+    .reject-btn { background-color: #dc3545; }
+    .view-btn { background-color: #007bff; }
+
+    /* Popup (Detail View) */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popup-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 400px;
+      text-align: center;
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      cursor: pointer;
+      color: #333;
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>📋 Verifier Dashboard - Campus Placement System</header>
+
+  <div class="container">
+    <div class="sidebar">
+      <h3>Menu</h3>
+      <ul>
+        <li class="active">Pending Verifications</li>
+        <li>Approved Students</li>
+        <li>Rejected List</li>
+        <li>Notifications</li>
+        <li>Logout</li>
+      </ul>
+    </div>
+
+    <div class="main">
+      <h2>Pending Student Verifications</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Registration No.</th>
+            <th>Branch</th>
+            <th>CGPA</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Rahul Sharma</td>
+            <td>CS2025001</td>
+            <td>CSE</td>
+            <td>8.7</td>
+            <td>
+              <button class="view-btn" onclick="openPopup('Rahul Sharma', 'CSE', 8.7)">View</button>
+              <button class="approve-btn">Approve</button>
+              <button class="reject-btn">Reject</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Neha Gupta</td>
+            <td>EE2025043</td>
+            <td>Electrical</td>
+            <td>8.2</td>
+            <td>
+              <button class="view-btn" onclick="openPopup('Neha Gupta', 'Electrical', 8.2)">View</button>
+              <button class="approve-btn">Approve</button>
+              <button class="reject-btn">Reject</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Detail Popup -->
+  <div class="popup" id="popup">
+    <div class="popup-content">
+      <span class="close-btn" onclick="closePopup()">&times;</span>
+      <h3>Student Details</h3>
+      <p id="studentName"></p>
+      <p id="studentBranch"></p>
+      <p id="studentCGPA"></p>
+      <p><strong>Resume:</strong> <a href="#">Download</a></p>
+    </div>
+  </div>
+
+  <script>
+    function openPopup(name, branch, cgpa) {
+      document.getElementById('popup').style.display = 'flex';
+      document.getElementById('studentName').innerText = "Name: " + name;
+      document.getElementById('studentBranch').innerText = "Branch: " + branch;
+      document.getElementById('studentCGPA').innerText = "CGPA: " + cgpa;
+    }
+
+    function closePopup() {
+      document.getElementById('popup').style.display = 'none';
+    }
+  </script>
+
+</body>
+</html>

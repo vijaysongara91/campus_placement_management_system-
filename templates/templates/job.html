@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Jobs Dashboard</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            font-size: 24px;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        /* Job Form */
+        .job-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .job-form label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .job-form input, .job-form textarea, .job-form select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+        .job-form button {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .job-form button:hover {
+            background-color: #0056b3;
+        }
+        /* Job List */
+        .job-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .job-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .job-item:last-child {
+            border-bottom: none;
+        }
+        .job-item button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .edit-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .edit-btn:hover {
+            background-color: #218838;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Recruiter Jobs Dashboard</h1>
+    </header>
+
+    <div class="main-content">
+        <!-- Job Form -->
+        <div class="job-form">
+            <h2 id="formTitle">Add New Job</h2>
+            <label for="jobTitle">Job Title</label>
+            <input type="text" id="jobTitle" placeholder="Enter Job Title">
+            <label for="jobDescription">Description</label>
+            <textarea id="jobDescription" rows="4" placeholder="Enter Job Description"></textarea>
+            <label for="jobLocation">Location</label>
+            <input type="text" id="jobLocation" placeholder="Enter Job Location">
+            <label for="jobType">Job Type</label>
+            <select id="jobType">
+                <option value="Full-Time">Full-Time</option>
+                <option value="Part-Time">Part-Time</option>
+                <option value="Internship">Internship</option>
+            </select>
+            <button id="saveJobBtn">Save Job</button>
+        </div>
+
+        <!-- Job List -->
+        <div class="job-list">
+            <h2>Job Listings</h2>
+            <div id="jobsContainer">
+                <!-- Jobs will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize jobs array from localStorage or empty
+        let jobs = JSON.parse(localStorage.getItem('jobsData')) || [];
+
+        let editIndex = -1;
+
+        const jobTitle = document.getElementById('jobTitle');
+        const jobDescription = document.getElementById('jobDescription');
+        const jobLocation = document.getElementById('jobLocation');
+        const jobType = document.getElementById('jobType');
+        const saveJobBtn = document.getElementById('saveJobBtn');
+        const jobsContainer = document.getElementById('jobsContainer');
+        const formTitle = document.getElementById('formTitle');
+
+        // Render jobs function
+        function renderJobs() {
+            jobsContainer.innerHTML = '';
+            if(jobs.length === 0) {
+                jobsContainer.innerHTML = '<p>No jobs available.</p>';
+                return;
+            }
+            jobs.forEach((job, index) => {
+                const jobDiv = document.createElement('div');
+                jobDiv.className = 'job-item';
+                jobDiv.innerHTML = `
+                    <div>
+                        <strong>${job.title}</strong> (${job.type})<br>
+                        ${job.description}<br>
+                        Location: ${job.location}
+                    </div>
+                    <div>
+                        <button class="edit-btn" onclick="editJob(${index})">Edit</button>
+                        <button class="delete-btn" onclick="deleteJob(${index})">Delete</button>
+                    </div>
+                `;
+                jobsContainer.appendChild(jobDiv);
+            });
+        }
+
+        // Save Job
+        saveJobBtn.addEventListener('click', () => {
+            const job = {
+                title: jobTitle.value,
+                description: jobDescription.value,
+                location: jobLocation.value,
+                type: jobType.value
+            };
+
+            if(!job.title || !job.description || !job.location) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            if(editIndex >= 0) {
+                jobs[editIndex] = job;
+                editIndex = -1;
+                formTitle.textContent = 'Add New Job';
+                saveJobBtn.textContent = 'Save Job';
+            } else {
+                jobs.push(job);
+            }
+
+            localStorage.setItem('jobsData', JSON.stringify(jobs));
+            renderJobs();
+
+            // Clear form
+            jobTitle.value = '';
+            jobDescription.value = '';
+            jobLocation.value = '';
+            jobType.value = 'Full-Time';
+        });
+
+        // Edit Job
+        function editJob(index) {
+            const job = jobs[index];
+            jobTitle.value = job.title;
+            jobDescription.value = job.description;
+            jobLocation.value = job.location;
+            jobType.value = job.type;
+            editIndex = index;
+            formTitle.textContent = 'Edit Job';
+            saveJobBtn.textContent = 'Update Job';
+        }
+
+        // Delete Job
+        function deleteJob(index) {
+            if(confirm('Are you sure you want to delete this job?')) {
+                jobs.splice(index, 1);
+                localStorage.setItem('jobsData', JSON.stringify(jobs));
+                renderJobs();
+            }
+        }
+
+        // Initial render
+        renderJobs();
+    </script>
+</body>
+</html>

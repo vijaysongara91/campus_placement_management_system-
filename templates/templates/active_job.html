@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Job Postings - Recruiter Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        nav {
+            margin-top: 0.5rem;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        main {
+            padding: 2rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        input, textarea, select {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        #jobList, #studentJobList {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .job-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            width: 300px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .job-card h3 {
+            margin-top: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            #jobList, #studentJobList {
+                flex-direction: column;
+            }
+            .job-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Campus Placement Management System</h1>
+        <nav>
+            <button id="toggleRole">Switch to Student View</button>
+        </nav>
+    </header>
+    
+    <main>
+        <section id="recruiterSection" class="hidden">
+            <h2>Manage Active Job Postings</h2>
+            <form id="jobForm">
+                <input type="text" id="jobTitle" placeholder="Job Title" required>
+                <input type="text" id="company" placeholder="Company Name" required>
+                <textarea id="description" placeholder="Job Description" required></textarea>
+                <textarea id="requirements" placeholder="Requirements (e.g., skills, experience)" required></textarea>
+                <input type="date" id="deadline" required>
+                <select id="status">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+                <button type="submit">Add Job Posting</button>
+            </form>
+            <div id="jobList"></div>
+        </section>
+        
+        <section id="studentSection">
+            <h2>Active Job Postings</h2>
+            <input type="text" id="search" placeholder="Search by title or company">
+            <div id="studentJobList"></div>
+        </section>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const jobForm = document.getElementById('jobForm');
+            const jobList = document.getElementById('jobList');
+            const studentJobList = document.getElementById('studentJobList');
+            const searchInput = document.getElementById('search');
+            const toggleRole = document.getElementById('toggleRole');
+            const recruiterSection = document.getElementById('recruiterSection');
+            const studentSection = document.getElementById('studentSection');
+
+            let jobs = JSON.parse(localStorage.getItem('jobs')) || [];
+            let isRecruiter = false; // Default to student view
+
+            // Toggle between recruiter and student views
+            toggleRole.addEventListener('click', () => {
+                isRecruiter = !isRecruiter;
+                toggleRole.textContent = isRecruiter ? 'Switch to Student View' : 'Switch to Recruiter View';
+                recruiterSection.classList.toggle('hidden');
+                studentSection.classList.toggle('hidden');
+                renderJobs();
+            });
+
+            // Add new job posting
+            jobForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newJob = {
+                    id: Date.now(),
+                    title: document.getElementById('jobTitle').value,
+                    company: document.getElementById('company').value,
+                    description: document.getElementById('description').value,
+                    requirements: document.getElementById('requirements').value,
+                    deadline: document.getElementById('deadline').value,
+                    status: document.getElementById('status').value
+                };
+                jobs.push(newJob);
+                saveJobs();
+                renderJobs();
+                jobForm.reset();
+            });
+
+            // Render jobs based on view
+            function renderJobs() {
+                if (isRecruiter) {
+                    jobList.innerHTML = jobs.map(job => `
+                        <div class="job-card">
+                            <h3>${job.title}</h3>
+                            <p><strong>Company:</strong> ${job.company}</p>
+                            <p><strong>Description:</strong> ${job.description}</p>
+                            <p><strong>Requirements:</strong> ${job.requirements}</p>
+                            <p><strong>Deadline:</strong> ${job.deadline}</p>
+                            <p><strong>Status:</strong> ${job.status}</p>
+                            <button onclick="editJob(${job.id})">Edit</button>
+                            <button onclick="deleteJob(${job.id})">Delete</button>
+                        </div>
+                    `).join('');
+                } else {
+                    const filteredJobs = jobs.filter(job => job.status === 'active' && 
+                        (job.title.toLowerCase().includes(searchInput.value.toLowerCase()) || 
+                         job.company.toLowerCase().includes(searchInput.value.toLowerCase())));
+                    studentJobList.innerHTML = filteredJobs.map(job => `
+                        <div class="job-card">
+                            <h3>${job.title}</h3>
+                            <p><strong>Company:</strong> ${job.company}</p>
+                            <p><strong>Description:</strong> ${job.description}</p>
+                            <p><strong>Requirements:</strong> ${job.requirements}</p>
+                            <p><strong>Deadline:</strong> ${job.deadline}</p>
+                            <button onclick="applyJob(${job.id})">Apply Now</button>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            // Search functionality for students
+            searchInput.addEventListener('input', renderJobs);
+
+            // Edit job (simple prompt-based for demo)
+            window.editJob = (id) => {
+                const job = jobs.find(j => j.id === id);
+                if (job) {
+                    document.getElementById('jobTitle').value = job.title;
+                    document.getElementById('company').value = job.company;
+                    document.getElementById('description').value = job.description;
+                    document.getElementById('requirements').value = job.requirements;
+                    document.getElementById('deadline').value = job.deadline;
+                    document.getElementById('status').value = job.status;
+                    deleteJob(id); // Remove old one, new one will be added on submit
+                }
+            };
+
+            // Delete job
+            window.deleteJob = (id) => {
+                jobs = jobs.filter(j => j.id !== id);
+                saveJobs();
+                renderJobs();
+            };
+
+            // Simulate apply for students
+            window.applyJob = (id) => {
+                alert('Application submitted for job ID: ' + id);
+            };
+
+            // Save to local storage
+            function saveJobs() {
+                localStorage.setItem('jobs', JSON.stringify(jobs));
+            }
+
+            // Initial render
+            renderJobs();
+        });
+    </script>
+</body>
+</html>

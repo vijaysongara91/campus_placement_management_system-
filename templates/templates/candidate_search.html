@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Search - Placement Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .search-section {
+            margin-bottom: 30px;
+        }
+
+        .search-section h3 {
+            margin-bottom: 15px;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input, select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            grid-column: span 2;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .results-section h3 {
+            margin-bottom: 15px;
+        }
+
+        .result-box {
+            margin-top: 20px;
+        }
+
+        .card {
+            padding: 15px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        #no-results {
+            display: none;
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            form {
+                grid-template-columns: 1fr;
+            }
+            button {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Campus Placement Management System</h1>
+        <h2>Candidate Search Feature</h2>
+    </header>
+    
+    <main>
+        <section class="search-section">
+            <h3>Search for Candidates</h3>
+            <form id="search-form">
+                <label for="name">Name:</label>
+                <input type="text" id="name" placeholder="e.g., John Doe">
+                
+                <label for="skills">Skills (comma-separated):</label>
+                <input type="text" id="skills" placeholder="e.g., Java, Python">
+                
+                <label for="keywords">Keywords:</label>
+                <input type="text" id="keywords" placeholder="e.g., Internship, Project">
+                
+                <label for="branch">Branch:</label>
+                <select id="branch">
+                    <option value="">Select Branch</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Mechanical">Mechanical</option>
+                </select>
+                
+                <label for="cgpa">Minimum CGPA:</label>
+                <input type="number" id="cgpa" min="0" max="10" step="0.1" placeholder="e.g., 7.5">
+                
+                <button type="button" id="search-btn">Search Candidates</button>
+            </form>
+        </section>
+        
+        <section class="results-section">
+            <h3>Search Results</h3>
+            <div id="resultBox" class="result-box"></div>
+            <p id="no-results">No candidates found matching your criteria.</p>
+        </section>
+    </main>
+    
+    <script>
+        // Mock candidate data (updated to match some from the new code, plus previous ones)
+        const candidates = [
+            { name: "John Doe", branch: "Computer Science", cgpa: 8.5, skills: "Java, Python, SQL", contact: "john@example.com" },
+            { name: "Jane Smith", branch: "Information Technology", cgpa: 7.8, skills: "JavaScript, React, Node.js", contact: "jane@example.com" },
+            { name: "Alice Johnson", branch: "Computer Science", cgpa: 9.0, skills: "Python, Machine Learning, Data Science", contact: "alice@example.com" },
+            { name: "Bob Brown", branch: "Electronics", cgpa: 7.2, skills: "C++, Embedded Systems", contact: "bob@example.com" },
+            { name: "Charlie Wilson", branch: "Computer Science", cgpa: 8.0, skills: "Java, Spring Boot, MySQL", contact: "charlie@example.com" },
+            { name: "Amit Sharma", branch: "Computer Science", cgpa: 8.1, skills: "Java, HTML, CSS", contact: "amit@example.com" },
+            { name: "Priya Verma", branch: "Electronics", cgpa: 7.5, skills: "Python, Embedded", contact: "priya@example.com" },
+            { name: "Ravi Kumar", branch: "Mechanical", cgpa: 7.0, skills: "AutoCAD, SolidWorks", contact: "ravi@example.com" },
+            { name: "Neha Singh", branch: "Computer Science", cgpa: 8.7, skills: "Python, Machine Learning", contact: "neha@example.com" },
+            { name: "Kunal Vora", branch: "Electronics", cgpa: 8.3, skills: "JavaScript, IoT", contact: "kunal@example.com" }
+        ];
+
+        // Function to filter candidates based on search criteria
+        function searchCandidates() {
+            const nameFilter = document.getElementById('name').value.toLowerCase();
+            const skillsFilter = document.getElementById('skills').value.toLowerCase().split(',').map(s => s.trim());
+            const keywordsFilter = document.getElementById('keywords').value.toLowerCase();
+            const branchFilter = document.getElementById('branch').value;
+            const cgpaFilter = parseFloat(document.getElementById('cgpa').value) || 0;
+
+            const filtered = candidates.filter(candidate => {
+                const matchesName = !nameFilter || candidate.name.toLowerCase().includes(nameFilter);
+                const matchesSkills = skillsFilter.every(skill => skill === '' || candidate.skills.toLowerCase().includes(skill));
+                const matchesKeywords = !keywordsFilter || candidate.skills.toLowerCase().includes(keywordsFilter) || candidate.name.toLowerCase().includes(keywordsFilter);
+                const matchesBranch = !branchFilter || candidate.branch === branchFilter;
+                const matchesCgpa = candidate.cgpa >= cgpaFilter;
+
+                return matchesName && matchesSkills && matchesKeywords && matchesBranch && matchesCgpa;
+            });
+
+            displayResults(filtered);
+        }
+
+        // Function to display filtered results in cards (merged from the new code's style)
+        function displayResults(results) {
+            const box = document.getElementById('resultBox');
+            const noResults = document.getElementById('no-results');
+            
+            box.innerHTML = '';
+            
+            if (results.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            results.forEach(candidate => {
+                box.innerHTML += `
+                    <div class="card">
+                        <h3>${candidate.name}</h3>
+                        <p><strong>Branch:</strong> ${candidate.branch}</p>
+                        <p><strong>CGPA:</strong> ${candidate.cgpa}</p>
+                        <p><strong>Skills:</strong> ${candidate.skills}</p>
+                        <p><strong>Contact:</strong> ${candidate.contact}</p>
+                    </div>
+                `;
+            });
+        }
+
+        // Event listener for search button
+        document.getElementById('search-btn').addEventListener('click', searchCandidates);
+
+        // Auto-search on input change (added for automatic search as requested)
+        document.getElementById('name').addEventListener('input', searchCandidates);
+        document.getElementById('skills').addEventListener('input', searchCandidates);
+        document.getElementById('keywords').addEventListener('input', searchCandidates);
+        document.getElementById('branch').addEventListener('change', searchCandidates);
+        document.getElementById('cgpa').addEventListener('input', searchCandidates);
+
+        // Initial display of all candidates (optional, for demo)
+        displayResults(candidates);
+    </script>
+</body>
+</html>
